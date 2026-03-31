@@ -52,6 +52,14 @@ body {
   gap: 6px;
 }
 
+.tool-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px;
+  cursor: default;
+}
+
 .panel-right {
   top: 24px;
   right: 24px;
@@ -151,7 +159,58 @@ body {
   transition: all 0.2s;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  position: relative;
 }
+
+.tool-btn .key-hint {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.1);
+  color: #666;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  pointer-events: none;
+}
+
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toggle-switch {
+  width: 28px;
+  height: 16px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  cursor: pointer;
+  position: relative;
+  border: none;
+  transition: background 0.2s;
+  padding: 0;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #555;
+  transition: all 0.2s;
+}
+
+.toggle-switch.on { background: rgba(255,80,80,0.3); }
+.toggle-switch.on::after { left: 14px; background: #ff4444; }
 
 .tool-btn:hover { background: rgba(255,255,255,0.08); color: #ccc; border-color: rgba(255,255,255,0.15); }
 .tool-btn.active { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.25); box-shadow: 0 0 20px rgba(255,255,255,0.05); }
@@ -303,19 +362,28 @@ input[type="range"]::-moz-range-thumb {
 
 <div class="particle-count" id="pcount"></div>
 <div class="mode-indicator" id="modeLabel">draw mode</div>
-<div class="hint" id="hint">click + drag to draw &nbsp;·&nbsp; shift + drag to orbit &nbsp;·&nbsp; scroll to zoom</div>
+<div class="hint" id="hint">click + drag to draw &nbsp;·&nbsp; shift + drag to orbit &nbsp;·&nbsp; ⌘/ctrl + drag to pan &nbsp;·&nbsp; scroll to zoom</div>
 
 <div class="ui-panel panel-left">
   <div class="logo">Nebula <span>drawer</span></div>
-  <button class="tool-btn active" id="btnDraw" title="Draw (1 / D)">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-  </button>
-  <button class="tool-btn" id="btnOrbit" title="Navigate (2 / Space)">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><ellipse cx="12" cy="12" rx="4" ry="10"/></svg>
-  </button>
-  <button class="tool-btn" id="btnErase" title="Erase (3 / E)">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 20H7L3 16l9-9 8 8-4 5z"/><path d="M6 11l8 8"/></svg>
-  </button>
+  <div class="tool-group">
+    <button class="tool-btn active" id="btnDraw" title="Draw (1 / D)">
+      <span class="key-hint">1</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    </button>
+    <button class="tool-btn" id="btnOrbit" title="Navigate (2 / Space)">
+      <span class="key-hint">2</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><ellipse cx="12" cy="12" rx="4" ry="10"/></svg>
+    </button>
+    <button class="tool-btn" id="btnErase" title="Erase (3 / E)">
+      <span class="key-hint">3</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 20H7L3 16l9-9 8 8-4 5z"/><path d="M6 11l8 8"/></svg>
+    </button>
+    <button class="tool-btn" id="btnGravCenter" title="Place gravity center (4 / G)">
+      <span class="key-hint">4</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+    </button>
+  </div>
 </div>
 
 <button class="settings-toggle" id="settingsToggle" title="Settings">
@@ -323,7 +391,7 @@ input[type="range"]::-moz-range-thumb {
 </button>
 <div class="ui-panel panel-right">
   <div class="control-group">
-    <div class="control-label">Particle density <span class="control-value" id="densityV">60</span></div>
+    <div class="control-label">Quantity <span class="control-value" id="densityV">60</span></div>
     <input type="range" id="density" min="5" max="200" value="60" step="5">
   </div>
   <div class="control-group">
@@ -337,6 +405,16 @@ input[type="range"]::-moz-range-thumb {
   <div class="control-group">
     <div class="control-label">Opacity <span class="control-value" id="opacV">0.8</span></div>
     <input type="range" id="opac" min="10" max="100" value="80">
+  </div>
+  <div class="control-group">
+    <div class="control-label">Time speed <span class="control-value" id="timeSpeedV">1.0</span></div>
+    <input type="range" id="timeSpeed" min="1" max="50" value="10">
+  </div>
+  <div class="control-group">
+    <div class="toggle-row">
+      <span class="control-label" style="margin-bottom:0">Show gravity center</span>
+      <button class="toggle-switch on" id="toggleGravCenter"></button>
+    </div>
   </div>
   <div class="control-group">
     <div class="control-label">Color</div>
@@ -357,6 +435,12 @@ input[type="range"]::-moz-range-thumb {
   <button class="bottom-btn" id="btnExplode">Explode</button>
   <button class="bottom-btn" id="btnGravity">Gravity</button>
   <button class="bottom-btn" id="btnDownload" style="border-color: rgba(255,255,255,0.15);">↓ Save PNG</button>
+  <a class="bottom-btn" href="https://github.com/alramalho/nebuladrawer" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;text-decoration:none;color:inherit;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+  </a>
+  <a class="bottom-btn" href="https://x.com/alramalh0" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;text-decoration:none;color:inherit;">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+  </a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -464,14 +548,29 @@ scene.add(points);
 let particleCount = 0;
 let strokeHistory = []; // array of { startIdx, count }
 let currentStroke = null;
+let undoStack = []; // general undo stack for all actions
 
 // State
-let mode = 'draw'; // draw, orbit, erase
+let mode = 'draw'; // draw, orbit, erase, gravcenter
 let drawColor = new THREE.Color('#ffffff');
 let isDrawing = false;
 let isOrbiting = false;
 let lastMouse = { x: 0, y: 0 };
 let physicsMode = null; // null, 'explode', 'gravity'
+let gravityCenter = new THREE.Vector3(0, 0, 0);
+let showGravCenter = true;
+
+// Gravity center marker
+const gcMarkerGeo = new THREE.SphereGeometry(1.5, 16, 16);
+const gcMarkerMat = new THREE.MeshBasicMaterial({ color: 0xff4444, transparent: true, opacity: 0.8 });
+const gcMarker = new THREE.Mesh(gcMarkerGeo, gcMarkerMat);
+scene.add(gcMarker);
+
+// Gravity center rings
+const gcRingGeo = new THREE.RingGeometry(2.5, 3, 32);
+const gcRingMat = new THREE.MeshBasicMaterial({ color: 0xff4444, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+const gcRing = new THREE.Mesh(gcRingGeo, gcRingMat);
+scene.add(gcRing);
 
 // Orbit controls (manual)
 let spherical = { radius: 150, theta: 0, phi: Math.PI / 2 };
@@ -516,8 +615,7 @@ function addParticles(worldPos) {
   const psize = +document.getElementById('psize').value / 10;
   const opac = +document.getElementById('opac').value / 100;
 
-  const splatScale = (splat / 25) * (splat / 25);
-  const count = Math.floor(density * splatScale * (0.5 + Math.random() * 0.5));
+  const count = Math.floor(density * (0.5 + Math.random() * 0.5));
   const camDir = new THREE.Vector3();
   camera.getWorldDirection(camDir);
   const right = new THREE.Vector3();
@@ -563,11 +661,17 @@ function addParticles(worldPos) {
 
 function eraseNear(worldPos) {
   const eraseRadius = +document.getElementById('splat').value * 1.5;
+  const camDir = new THREE.Vector3();
+  camera.getWorldDirection(camDir);
   for (let i = 0; i < particleCount; i++) {
     const dx = positions[i*3] - worldPos.x;
     const dy = positions[i*3+1] - worldPos.y;
     const dz = positions[i*3+2] - worldPos.z;
-    if (dx*dx + dy*dy + dz*dz < eraseRadius * eraseRadius) {
+    const dot = dx * camDir.x + dy * camDir.y + dz * camDir.z;
+    const px = dx - dot * camDir.x;
+    const py = dy - dot * camDir.y;
+    const pz = dz - dot * camDir.z;
+    if (px*px + py*py + pz*pz < eraseRadius * eraseRadius) {
       alphas[i] *= 0.85;
       if (alphas[i] < 0.01) alphas[i] = 0;
     }
@@ -578,14 +682,27 @@ function eraseNear(worldPos) {
 // Events
 const canvas = renderer.domElement;
 let isShiftOrbiting = false;
+let isPanning = false;
+
+function saveCameraUndo() {
+  undoStack.push({ type: 'camera', radius: spherical.radius, theta: spherical.theta, phi: spherical.phi, target: target.clone() });
+}
 
 canvas.addEventListener('mousedown', e => {
   if (e.button === 2 || (e.button === 0 && mode === 'orbit')) {
+    saveCameraUndo();
     isOrbiting = true;
     lastMouse = { x: e.clientX, y: e.clientY };
     return;
   }
+  if (e.button === 0 && (e.metaKey || e.ctrlKey)) {
+    saveCameraUndo();
+    isPanning = true;
+    lastMouse = { x: e.clientX, y: e.clientY };
+    return;
+  }
   if (e.button === 0 && e.shiftKey) {
+    saveCameraUndo();
     isShiftOrbiting = true;
     lastMouse = { x: e.clientX, y: e.clientY };
     return;
@@ -601,9 +718,32 @@ canvas.addEventListener('mousedown', e => {
     const wp = screenToWorld(e.clientX, e.clientY);
     if (wp) eraseNear(wp);
   }
+  if (e.button === 0 && mode === 'gravcenter') {
+    const wp = screenToWorld(e.clientX, e.clientY);
+    if (wp) {
+      undoStack.push({ type: 'gravcenter', pos: gravityCenter.clone() });
+      gravityCenter.copy(wp);
+    }
+  }
 });
 
 canvas.addEventListener('mousemove', e => {
+  if (isPanning) {
+    const dx = e.clientX - lastMouse.x;
+    const dy = e.clientY - lastMouse.y;
+    const right = new THREE.Vector3();
+    const up = new THREE.Vector3();
+    const camDir = new THREE.Vector3();
+    camera.getWorldDirection(camDir);
+    right.crossVectors(camDir, camera.up).normalize();
+    up.crossVectors(right, camDir).normalize();
+    const panSpeed = spherical.radius * 0.002;
+    target.add(right.multiplyScalar(-dx * panSpeed));
+    target.add(up.multiplyScalar(dy * panSpeed));
+    lastMouse = { x: e.clientX, y: e.clientY };
+    updateCamera();
+    return;
+  }
   if (isOrbiting || isShiftOrbiting) {
     const dx = e.clientX - lastMouse.x;
     const dy = e.clientY - lastMouse.y;
@@ -626,8 +766,10 @@ canvas.addEventListener('mousemove', e => {
 canvas.addEventListener('mouseup', () => {
   isOrbiting = false;
   isShiftOrbiting = false;
+  isPanning = false;
   if (isDrawing && currentStroke && currentStroke.count > 0) {
     strokeHistory.push(currentStroke);
+    undoStack.push({ type: 'stroke', startIdx: currentStroke.startIdx });
   }
   isDrawing = false;
   currentStroke = null;
@@ -687,7 +829,10 @@ canvas.addEventListener('touchmove', e => {
 canvas.addEventListener('touchend', e => {
   if (e.touches.length < 2) { isOrbiting = false; lastTouchDist = null; lastTouch = null; }
   if (e.touches.length === 0) {
-    if (isDrawing && currentStroke && currentStroke.count > 0) strokeHistory.push(currentStroke);
+    if (isDrawing && currentStroke && currentStroke.count > 0) {
+      strokeHistory.push(currentStroke);
+      undoStack.push({ type: 'stroke', startIdx: currentStroke.startIdx });
+    }
     isDrawing = false;
     currentStroke = null;
   }
@@ -698,6 +843,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'd' || e.key === 'D' || e.key === '1') setMode('draw');
   if (e.key === 'e' || e.key === 'E' || e.key === '3') setMode('erase');
   if (e.key === ' ' || e.key === '2') { e.preventDefault(); setMode('orbit'); }
+  if (e.key === 'g' || e.key === 'G' || e.key === '4') setMode('gravcenter');
   if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey)) undo();
 });
 
@@ -706,15 +852,27 @@ function setMode(m) {
   document.getElementById('btnDraw').classList.toggle('active', m === 'draw');
   document.getElementById('btnOrbit').classList.toggle('active', m === 'orbit');
   document.getElementById('btnErase').classList.toggle('active', m === 'erase');
-  document.getElementById('modeLabel').textContent = m + ' mode';
+  document.getElementById('btnGravCenter').classList.toggle('active', m === 'gravcenter');
+  const labels = { draw: 'draw mode', orbit: 'orbit mode', erase: 'erase mode', gravcenter: 'place gravity center' };
+  document.getElementById('modeLabel').textContent = labels[m] || m + ' mode';
 }
 
 // Tool buttons
 document.getElementById('btnDraw').addEventListener('click', () => setMode('draw'));
 document.getElementById('btnOrbit').addEventListener('click', () => setMode('orbit'));
 document.getElementById('btnErase').addEventListener('click', () => setMode('erase'));
+document.getElementById('btnGravCenter').addEventListener('click', () => setMode('gravcenter'));
 
 // Sliders
+document.getElementById('timeSpeed').addEventListener('input', e => {
+  document.getElementById('timeSpeedV').textContent = (e.target.value / 10).toFixed(1);
+});
+
+document.getElementById('toggleGravCenter').addEventListener('click', function() {
+  showGravCenter = !showGravCenter;
+  this.classList.toggle('on', showGravCenter);
+});
+
 ['density','splat','psize','opac'].forEach(id => {
   document.getElementById(id).addEventListener('input', e => {
     const v = id === 'psize' ? (e.target.value / 10).toFixed(1) :
@@ -742,19 +900,30 @@ document.getElementById('btnClear').addEventListener('click', () => {
 });
 
 function undo() {
-  if (strokeHistory.length === 0) return;
-  const last = strokeHistory.pop();
-  particleCount = last.startIdx;
-  geo.setDrawRange(0, particleCount);
+  if (undoStack.length === 0) return;
+  const action = undoStack.pop();
+  if (action.type === 'stroke') {
+    strokeHistory.pop();
+    particleCount = action.startIdx;
+    geo.setDrawRange(0, particleCount);
+  } else if (action.type === 'camera') {
+    spherical.radius = action.radius;
+    spherical.theta = action.theta;
+    spherical.phi = action.phi;
+    target.copy(action.target);
+    updateCamera();
+  } else if (action.type === 'gravcenter') {
+    gravityCenter.copy(action.pos);
+  }
 }
 document.getElementById('btnUndo').addEventListener('click', undo);
 
 document.getElementById('btnExplode').addEventListener('click', () => {
   physicsMode = physicsMode === 'explode' ? null : 'explode';
   for (let i = 0; i < particleCount; i++) {
-    const dx = positions[i*3];
-    const dy = positions[i*3+1];
-    const dz = positions[i*3+2];
+    const dx = positions[i*3] - gravityCenter.x;
+    const dy = positions[i*3+1] - gravityCenter.y;
+    const dz = positions[i*3+2] - gravityCenter.z;
     const len = Math.sqrt(dx*dx + dy*dy + dz*dz) || 1;
     velocities[i*3]   = (dx / len) * (0.5 + Math.random() * 1.5);
     velocities[i*3+1] = (dy / len) * (0.5 + Math.random() * 1.5);
@@ -781,37 +950,48 @@ function animate() {
   time += 0.016;
   starMat.uniforms.uTime.value = time;
 
+  const tSpeed = +document.getElementById('timeSpeed').value / 10;
+
   if (physicsMode === 'explode') {
     for (let i = 0; i < particleCount; i++) {
-      positions[i*3]   += velocities[i*3];
-      positions[i*3+1] += velocities[i*3+1];
-      positions[i*3+2] += velocities[i*3+2];
-      velocities[i*3]   *= 0.995;
-      velocities[i*3+1] *= 0.995;
-      velocities[i*3+2] *= 0.995;
+      positions[i*3]   += velocities[i*3] * tSpeed;
+      positions[i*3+1] += velocities[i*3+1] * tSpeed;
+      positions[i*3+2] += velocities[i*3+2] * tSpeed;
+      const drag = Math.pow(0.995, tSpeed);
+      velocities[i*3]   *= drag;
+      velocities[i*3+1] *= drag;
+      velocities[i*3+2] *= drag;
     }
     geo.attributes.position.needsUpdate = true;
   }
 
   if (physicsMode === 'gravity') {
     for (let i = 0; i < particleCount; i++) {
-      const dx = -positions[i*3];
-      const dy = -positions[i*3+1];
-      const dz = -positions[i*3+2];
+      const dx = gravityCenter.x - positions[i*3];
+      const dy = gravityCenter.y - positions[i*3+1];
+      const dz = gravityCenter.z - positions[i*3+2];
       const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) || 1;
-      const force = 0.3 / (dist * 0.1 + 1);
+      const force = 0.3 / (dist * 0.1 + 1) * tSpeed;
       velocities[i*3]   += (dx / dist) * force;
       velocities[i*3+1] += (dy / dist) * force;
       velocities[i*3+2] += (dz / dist) * force;
-      velocities[i*3]   *= 0.98;
-      velocities[i*3+1] *= 0.98;
-      velocities[i*3+2] *= 0.98;
-      positions[i*3]   += velocities[i*3];
-      positions[i*3+1] += velocities[i*3+1];
-      positions[i*3+2] += velocities[i*3+2];
+      const drag = Math.pow(0.98, tSpeed);
+      velocities[i*3]   *= drag;
+      velocities[i*3+1] *= drag;
+      velocities[i*3+2] *= drag;
+      positions[i*3]   += velocities[i*3] * tSpeed;
+      positions[i*3+1] += velocities[i*3+1] * tSpeed;
+      positions[i*3+2] += velocities[i*3+2] * tSpeed;
     }
     geo.attributes.position.needsUpdate = true;
   }
+
+  // Update gravity center marker
+  gcMarker.position.copy(gravityCenter);
+  gcRing.position.copy(gravityCenter);
+  gcRing.lookAt(camera.position);
+  gcMarker.visible = showGravCenter;
+  gcRing.visible = showGravCenter;
 
   document.getElementById('pcount').textContent = particleCount.toLocaleString() + ' particles';
 
